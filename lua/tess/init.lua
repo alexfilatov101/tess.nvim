@@ -50,7 +50,6 @@ end
 
 function M.setup(opts)
 	o = vim.tbl_deep_extend("keep", opts or {}, defaults)
-	print(o.binds.rename)
 	vim.keymap.set("n", o.binds.open, function()
 		Tess.open()
 	end, { desc = "Open terminal" })

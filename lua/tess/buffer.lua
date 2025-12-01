@@ -40,7 +40,6 @@ function Buffer:rename_prompt()
 end
 
 local function set_keymaps(buf, opts)
-	print(opts.hide)
 	local bo = { buffer = true, silent = true }
 	vim.keymap.set("t", opts.hide, function()
 		buf:close()
