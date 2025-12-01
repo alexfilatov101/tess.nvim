@@ -85,6 +85,7 @@ function Buffer:open(opts)
 	if self.buf == 0 then
 		vim.cmd("term")
 		self.buf = vim.api.nvim_get_current_buf()
+		vim.cmd("set nobuflisted")
 		set_keymaps(self, opts.binds)
 	end
 	vim.cmd("startinsert")
