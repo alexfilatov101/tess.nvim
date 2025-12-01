@@ -48,7 +48,7 @@ function Tess.open()
 	end
 end
 
-function M.config(_, opts)
+function M.setup(opts)
 	o = vim.tbl_deep_extend("keep", opts or {}, defaults)
 	print(o.binds.rename)
 	vim.keymap.set("n", o.binds.open, function()
