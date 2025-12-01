@@ -1,4 +1,4 @@
-require("tess.buffer")
+local Buffer = require("tess.buffer")
 
 local buffers = {}
 

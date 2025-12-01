@@ -1,4 +1,4 @@
-Buffer = {}
+local Buffer = {}
 
 local buffer_defaults = {
 	title = "Terminal",
@@ -90,3 +90,5 @@ function Buffer:open(opts)
 	end
 	vim.cmd("startinsert")
 end
+
+return Buffer
