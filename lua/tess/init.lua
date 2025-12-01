@@ -1,4 +1,4 @@
-local b = require("tess.buffer")
+require("tess.buffer")
 
 local buffers = {}
 
@@ -34,7 +34,7 @@ function Tess.override()
 	if buffers[c] then
 		buffers[c]:kill()
 	end
-	buffers[c] = b:new()
+	buffers[c] = Buffer:new()
 	buffers[c]:open(o)
 end
 
@@ -43,7 +43,7 @@ function Tess.open()
 	if buffers[c] then
 		buffers[c]:open(o)
 	else
-		buffers[c] = b:new()
+		buffers[c] = Buffer:new()
 		buffers[c]:open(o)
 	end
 end
