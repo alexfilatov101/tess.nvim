@@ -108,7 +108,7 @@ function M.setup(opts)
 		local metaPath = wd .. "/.nvim"
 		meta.new(metaPath, { "tess" })
 		if root then
-			git.exclude(root, metaPath)
+			git.exclude(root, ".nvim")
 		end
 	end
 	vim.keymap.set("n", config.keymaps.open, function()

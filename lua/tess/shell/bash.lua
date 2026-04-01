@@ -11,7 +11,7 @@ local bash = {
 		}
 		if opts.history.enabled then
 			local metaPath = opts.root .. "/.nvim"
-			env.HISTFILE = metaPath .. "/tess/t_" .. tostring(opts.id)
+			env.HISTFILE = metaPath .. "/tess/history/t_" .. tostring(opts.id)
 		end
 		local job_id = vim.fn.jobstart(cmd, {
 			term = true,
