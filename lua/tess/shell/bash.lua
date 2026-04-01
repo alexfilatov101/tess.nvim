@@ -12,7 +12,7 @@ local bash = {
 		if opts.history.enabled then
 			local metaPath = opts.root .. "/.nvim"
 			local histPath = metaPath .. "/tess/history/t_" .. tostring(opts.id)
-			local histFile = io.open(histPath)
+			local histFile = io.open(histPath, "a")
 			if histFile then
 				histFile:close()
 				env.HISTFILE = histPath
