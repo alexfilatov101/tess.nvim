@@ -106,7 +106,7 @@ function M.setup(opts)
 		local wd = vim.fn.getcwd()
 		local root = git.root(wd)
 		local metaPath = wd .. "/.nvim"
-		meta.new(metaPath, { "tess/history" })
+		meta.new(metaPath, { "tess/history", "tess/source" })
 		if root then
 			git.exclude(root, ".nvim")
 		end
