@@ -5,7 +5,7 @@ Sessions use vim built-in count, i.e. pressing ```2<leader>t``` will open sessio
 
 Session history is stored alongside project in `.nvim/tess/history` folder. You can disable this functionality by setting `shell.history.enabled` to `false`. This folder is added to .gitignore by default
 
-Right now `bash` is the only supported shell, though some others might work as well. _Basically, for shell to be supported, it has to implement --rcfile flag for sourcing files, and HISTFILE env variable to load history_
+Right now `bash` is the only supported shell, though some others might work as well. _Basically, for shell to be supported in current version of tess, it has to implement --rcfile flag for sourcing files, and HISTFILE env variable to load history_
 
 ## Installation
 
@@ -18,6 +18,7 @@ Default setup:
   "alexfilatov101/tess.nvim",
   config = function()
     require("tess").setup({
+
       -- Shell setup
 	    shell = {
         -- shell to run in new session
@@ -38,19 +39,26 @@ Default setup:
         -- anything else - relative to project root
 	    	relative = "win",
 	    },
+
       -- Window setup
       -- vim.api.keyset.win_config
-      -- setup below creates new centered floating window
+      -- VS Code - style terminal
       win = {
-        relative = "editor",
-        anchor = "NW",
-        row = 3,
-        col = 20,
-        width = vim.o.columns - 40,
-        height = vim.o.lines - 8,
-        border = "single",
-        title_pos = "center",
+        split = "below",
+        height = 16,
       },
+      -- setup below creates new centered floating window
+      -- win = {
+      --   relative = "editor",
+      --   anchor = "NW",
+      --   row = 3,
+      --   col = 20,
+      --   width = vim.o.columns - 40,
+      --   height = vim.o.lines - 8,
+      --   border = "single",
+      --   title_pos = "center",
+      -- },
+
       -- Keybinds
       binds = {
         open = "<leader>t", -- open session (creates new on first call)
@@ -59,6 +67,8 @@ Default setup:
         hide = "<ESC>", -- close window
         close = "<C-q>", -- kill session
         normal = "jk", -- exit terminal mode
+        next = "<C-l>", -- switch to next session, create one if needed. Works with vim.v.count
+        prev = "<C-h>" -- switch to previous session, create on if needed. Works with vim.v.count
       }
     })
 }

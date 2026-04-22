@@ -29,22 +29,15 @@ local defaults = {
 		source = nil,
 		relative = "win",
 	},
-	window = {
-		relative = "editor",
-		anchor = "NW",
-		row = 3,
-		col = 20,
-		width = vim.o.columns - 40,
-		height = vim.o.lines - 8,
-		border = "single",
-		title_pos = "center",
-	},
+	window = {},
 	keymaps = {
 		open = "<leader>t",
 		override = "<leader>to",
 		rename = "<C-n>",
 		hide = "<ESC>",
 		close = "<C-q>",
+		next = "<C-L>",
+		prev = "<C-H>",
 		normal = "jk",
 	},
 }
@@ -52,13 +45,20 @@ local defaults = {
 ---@type tess.opts
 local config
 
-local M = {}
-
 local shells = {
 	bash = Shell.bash,
 }
 
 Tess = {}
+
+local function setTessKeymaps(buf)
+	vim.keymap.set("t", config.keymaps.next, function()
+		Tess.swap(Tess.active_id + vim.v.count1)
+	end, { desc = "Next terminal", buffer = buf })
+	vim.keymap.set("t", config.keymaps.prev, function()
+		Tess.swap(Tess.active_id - vim.v.count1)
+	end, { desc = "Next terminal", buffer = buf })
+end
 
 local function getSessionOpts(id)
 	local sop = {
@@ -85,8 +85,14 @@ function Tess.override()
 	end
 	local sop = getSessionOpts(c)
 	sessions[c] = Session:new(shells[config.shell.app], c)
-	sessions[c]:init_buffer(sop)
+	local b = sessions[c]:init_buffer(sop)
+	setTessKeymaps(b)
 	sessions[c]:open_window(sop.window)
+	Tess.active_id = c
+end
+
+function Tess.sessions()
+	return sessions
 end
 
 function Tess.open()
@@ -94,13 +100,34 @@ function Tess.open()
 	if not sessions[c] or not sessions[c].bufnr then
 		local sop = getSessionOpts(c)
 		sessions[c] = Session:new(shells[config.shell.app], c)
-		sessions[c]:init_buffer(sop)
+		local b = sessions[c]:init_buffer(sop)
+		setTessKeymaps(b)
 	end
+	Tess.active_id = c
 	sessions[c]:open_window(config.window)
 end
 
+function Tess.swap(id)
+	if id < 1 then
+		return
+	end
+	local active_win = sessions[Tess.active_id].window
+	sessions[Tess.active_id].window = nil
+	if not sessions[id] or not sessions[id].bufnr then
+		local sop = getSessionOpts(id)
+		sessions[id] = Session:new(shells[config.shell.app], id)
+		local b = sessions[id]:init_buffer(sop)
+		setTessKeymaps(b)
+	end
+	if sessions[id].window then
+		return
+	end
+	sessions[id]:swap_window(active_win)
+	Tess.active_id = id
+end
+
 ---@param opts tess.opts
-function M.setup(opts)
+function Tess.setup(opts)
 	config = vim.tbl_deep_extend("keep", opts or {}, defaults)
 	if config.shell.history.enabled then
 		local wd = vim.fn.getcwd()
@@ -119,4 +146,4 @@ function M.setup(opts)
 	end, { desc = "Override terminal" })
 end
 
-return M
+return Tess

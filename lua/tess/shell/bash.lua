@@ -4,7 +4,7 @@ local bash = {
 	start = function(self, opts)
 		local cmd = { self.shell }
 		local env = {
-			TESS_SESSION = 1,
+			TESS_SESSION_ID = opts.id,
 			HISTCONTROL = "ignorespace",
 		}
 		local metaPath = opts.root .. "/.nvim"

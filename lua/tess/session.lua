@@ -38,7 +38,10 @@ end
 ---@param title string New session title
 function Session:rename(title)
 	self.title = title
-	if self.window then
+	if self.bufnr then
+		vim.api.nvim_buf_set_name(self.bufnr, title)
+	end
+	if self.window and vim.api.nvim_win_get_config(self.window).split == nil then
 		vim.api.nvim_win_set_config(self.window, { title = "󰆍 " .. title })
 	end
 end
@@ -74,14 +77,29 @@ function Session:open_window(config)
 			return self.window
 		end
 	end
-	config.title = " 󰆍 " .. self.title .. " "
+	if config.split == nil then
+		config.title = " 󰆍 " .. self.title .. " "
+	end
 	self.window = vim.api.nvim_open_win(self.bufnr, true, config)
 	if self.window == 0 then
 		self.window = nil
 		return self.window
 	end
+	if not self.job_id then
+		self.job_id = self.shell:start(self.shell_opts)
+	end
 	vim.cmd("startinsert")
 	return self.window
+end
+
+--- Swap session window
+function Session:swap_window(win)
+	assert(vim.api.nvim_win_is_valid(win), "Tess panic: window was not initalized")
+	vim.api.nvim_win_set_buf(win, self.bufnr)
+	self.window = win
+	if not self.job_id then
+		self.job_id = self.shell:start(self.shell_opts)
+	end
 end
 
 ---Close session window if open
@@ -96,7 +114,7 @@ function Session:close_window()
 end
 
 local function set_keymaps(session, opts)
-	local bo = { buffer = true, silent = true }
+	local bo = { buffer = session.bufnr, silent = true }
 	vim.keymap.set("t", opts.hide, function()
 		session:close_window()
 	end, bo)
@@ -109,6 +127,7 @@ local function set_keymaps(session, opts)
 	end, bo)
 	vim.api.nvim_create_autocmd("BufUnload", {
 		callback = function()
+			session.shell.stop(session.job_id)
 			session.bufnr = nil
 			session.job_id = nil
 		end,
@@ -134,8 +153,9 @@ function Session:init_buffer(config)
 		self.bufnr = nil
 		return self.bufnr
 	end
-	self:open_window(config.window)
-	self.job_id = self.shell:start(config.shell)
+	vim.api.nvim_buf_set_name(self.bufnr, self.title)
+	self.shell_opts = config.shell
+	-- self:open_window(config.window)
 	set_keymaps(self, config.keymaps)
 	return self.bufnr
 end
